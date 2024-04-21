@@ -1,0 +1,79 @@
+button {
+  cursor: pointer;
+}
+
+.photos-album--container {
+  padding: 10px;
+  background-color: #193447;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.photos-album--container > h3 {
+  color: #869db0;
+}
+
+.photos-albums--tools-bar {
+  display: flex;
+  gap: 30px;
+}
+
+.photos-albums--tools-bar > input,
+button {
+  padding: 4px;
+  font-size: 12px;
+  color: white;
+  background-color: transparent;
+  border-radius: 3px;
+  border-color: #4b687c;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.photos-albums--tools-bar__select-album {
+  position: relative;
+}
+
+.photos-albums--tools-bar__select-album > ul {
+  background-color: white;
+  position: absolute;
+  height: 500px;
+  overflow: hidden;
+  overflow-y: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  list-style: none;
+  padding: 3px;
+  width: 200px;
+}
+
+.photos-albums--tools-bar__select-album > ul::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 5px;
+}
+
+.photos-albums--tools-bar__select-album > ul::-webkit-scrollbar-thumb {
+  background-color: gray;
+  border-radius: 5px;
+}
+
+.photos-albums--tools-bar__select-album > ul > li {
+  cursor: pointer;
+  padding: 10px 20px;
+  border-radius: 10px;
+  transition: background-color 0.3s, transform 0.3s;
+  list-style: none;
+  font-size: 0.9rem;
+}
+
+.photos-albums--tools-bar__select-album > ul > li:hover {
+  background-color: lightgrey; /* Change color on hover for feedback */
+  transform: scale(1.05); /* Slight zoom effect on hover */
+}
+
+.photos-album {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
