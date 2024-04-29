@@ -22,9 +22,8 @@ export const PhotoModalContent = ({ title: photoTitle, url: photoSrc, albumId: p
     useEffect(() => {
         const fetchAlbum = async () => {
             const res = await fetch(`https://jsonplaceholder.typicode.com/albums?id=${photoAlbum}`)
-            const albumData: Array<Album> = await res.json()
-            const [firstAlbum] = albumData
-            setAlbum(firstAlbum)
+            const [albumData] = await res.json()
+            setAlbum(albumData as Album)
         }
         setTimeout(() => {
 

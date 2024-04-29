@@ -30,8 +30,8 @@ export const PhotosAlbumPage = () => {
         loadInitialPhotos()
     }, [selectedAlbumId])
 
-    const fetchPhotos = async (start: number) => {
-        const res = await fetch(`https://jsonplaceholder.typicode.com/photos?albumId=${selectedAlbumId ?? 1}&_start=${start}&_limit=30`)
+    const fetchPhotos = async (startIndex: number) => {
+        const res = await fetch(`https://jsonplaceholder.typicode.com/photos?albumId=${selectedAlbumId ?? 1}&_start=${startIndex}&_limit=30`)
         const photosData = await res.json()
         return photosData
     }
@@ -40,6 +40,7 @@ export const PhotosAlbumPage = () => {
         const { value } = event.target
         const updatedPhotos = photos?.filter(photo => photo.title.toLocaleLowerCase().includes(value.toLocaleLowerCase()))
         setPhotosCopy(updatedPhotos)
+        setHasMore(!(updatedPhotos.length < 30))
     }
 
     const handleSelectedAlbum = (albumId: number) => {
@@ -48,16 +49,16 @@ export const PhotosAlbumPage = () => {
     }
 
     const loadMoreData = async () => {
-        const start = photos.length
-        const newPhotos = await fetchPhotos(start)
+        const startIndex = photos.length
+        const newPhotos = await fetchPhotos(startIndex)
 
         if (newPhotos.length === 0 || photosCopy.length >= 50) {
             setHasMore(false)
 
         }
         else {
-            setPhotos(prev => [...prev, ...newPhotos])
-            setPhotosCopy(prev => [...prev, ...newPhotos])
+            setPhotos(prevPhotos => [...prevPhotos, ...newPhotos])
+            setPhotosCopy(prevPhotosCopy => [...prevPhotosCopy, ...newPhotos])
         }
     }
 
@@ -65,8 +66,11 @@ export const PhotosAlbumPage = () => {
         <h3>Photo Albums Page</h3>
         <div className='photos-albums--tools-bar'>
             <input onChange={(e) => handleChange(e)} name="title" placeholder='Search Photo' />
-            <div className='photos-albums--tools-bar__select-album' onClick={(e) => e.stopPropagation()}>
-                <button onClick={() => setIsAlbumsMenuOpen(prev => !prev)}>Select Album</button>
+            <div className='photos-albums--tools-bar__select-album' >
+                <button onClick={(e) => {
+                    e.stopPropagation()
+                    setIsAlbumsMenuOpen(prev => !prev)
+                }}>Select Album</button>
                 {isAlbumsMenuOpen && <ul className='photo-albums--tools-bar__albums-menu'>
                     {albums?.map(album => <li key={album.id} onClick={() => handleSelectedAlbum(album.id)}>{album.title}</li>)}
                 </ul>}

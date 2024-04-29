@@ -1,4 +1,5 @@
 import { PhotosAlbumPage } from "./components/photos-album/PhotosAlbumPage";
+import './App.css'
 
 function App() {
   return (

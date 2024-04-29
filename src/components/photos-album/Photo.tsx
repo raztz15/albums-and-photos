@@ -21,14 +21,10 @@ export const Photo = ({ photo }: IPhotoProps) => {
 
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
 
-    const onCloseModal = () => {
-        setIsOpenModal(false)
-    }
-
     return (
         <div className='photo--container'>
             <div className='photo--header'  >
-                <img src={thumbnailUrl} onClick={() => setIsOpenModal(prev => !prev)} />
+                <img src={thumbnailUrl} onClick={() => setIsOpenModal(prevIsOpenModal => !prevIsOpenModal)} />
             </div>
             <div className='photo-body--container'>
                 <div className='photo-body--description'>
@@ -37,7 +33,7 @@ export const Photo = ({ photo }: IPhotoProps) => {
                 </div>
                 <a className='photo--url' href={url} >{url}</a>
             </div>
-            {isOpenModal && <Modal onClose={onCloseModal} children={<PhotoModalContent {...photo} />} />}
+            {isOpenModal && <Modal onClose={() => setIsOpenModal(false)} children={<PhotoModalContent {...photo} />} />}
         </div>
     )
 }
