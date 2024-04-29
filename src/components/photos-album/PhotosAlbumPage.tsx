@@ -2,6 +2,7 @@ import './PhotosAlbumPage.css'
 import React, { useEffect, useState } from 'react'
 import { Photo } from './Photo'
 import { Album } from '../photo-modal/PhotoModalContent'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 export const PhotosAlbumPage = () => {
 
@@ -10,23 +11,30 @@ export const PhotosAlbumPage = () => {
     const [albums, setAlbums] = useState<Array<Album>>()
     const [isAlbumsMenuOpen, setIsAlbumsMenuOpen] = useState<boolean>(false)
     const [selectedAlbumId, setselectedAlbumId] = useState<number>()
+    const [hasMore, setHasMore] = useState<boolean>(true)
 
     useEffect(() => {
-        const fetchPhotos = async () => {
-            const res = await fetch(`https://jsonplaceholder.typicode.com/photos?albumId=${selectedAlbumId ?? 1}`)
-            const photosData = await res.json()
-            setPhotos(photosData)
-            setPhotosCopy(photosData)
-        }
         const fetchAlbums = async () => {
             const res = await fetch(`https://jsonplaceholder.typicode.com/albums`)
             const albumsData = await res.json()
             setAlbums(albumsData)
         }
 
+        const loadInitialPhotos = async () => {
+            const initialPhotos = await fetchPhotos(0)
+            setPhotos(initialPhotos)
+            setPhotosCopy(initialPhotos)
+        }
+
         fetchAlbums()
-        fetchPhotos()
+        loadInitialPhotos()
     }, [selectedAlbumId])
+
+    const fetchPhotos = async (start: number) => {
+        const res = await fetch(`https://jsonplaceholder.typicode.com/photos?albumId=${selectedAlbumId ?? 1}&_start=${start}&_limit=30`)
+        const photosData = await res.json()
+        return photosData
+    }
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target
@@ -39,23 +47,41 @@ export const PhotosAlbumPage = () => {
         setIsAlbumsMenuOpen(false)
     }
 
+    const loadMoreData = async () => {
+        const start = photos.length
+        const newPhotos = await fetchPhotos(start)
 
-    return (
-        <div className='photos-album--container' onClick={() => setIsAlbumsMenuOpen(false)}>
-            <h3>Photo Albums Page</h3>
-            <div className='photos-albums--tools-bar'>
-                <input onChange={(e) => handleChange(e)} name="title" placeholder='Search Photo' />
-                <div className='photos-albums--tools-bar__select-album' onClick={(e) => e.stopPropagation()}>
-                    <button onClick={() => setIsAlbumsMenuOpen(prev => !prev)}>Select Album</button>
-                    {isAlbumsMenuOpen && <ul className='photo-albums--tools-bar__albums-menu'>
-                        {albums?.map(album => <li key={album.id} onClick={() => handleSelectedAlbum(album.id)}>{album.title}</li>)}
-                    </ul>}
-                </div>
+        if (newPhotos.length === 0 || photosCopy.length >= 50) {
+            setHasMore(false)
 
+        }
+        else {
+            setPhotos(prev => [...prev, ...newPhotos])
+            setPhotosCopy(prev => [...prev, ...newPhotos])
+        }
+    }
+
+    return <div className='photos-album--container' onClick={() => setIsAlbumsMenuOpen(false)}>
+        <h3>Photo Albums Page</h3>
+        <div className='photos-albums--tools-bar'>
+            <input onChange={(e) => handleChange(e)} name="title" placeholder='Search Photo' />
+            <div className='photos-albums--tools-bar__select-album' onClick={(e) => e.stopPropagation()}>
+                <button onClick={() => setIsAlbumsMenuOpen(prev => !prev)}>Select Album</button>
+                {isAlbumsMenuOpen && <ul className='photo-albums--tools-bar__albums-menu'>
+                    {albums?.map(album => <li key={album.id} onClick={() => handleSelectedAlbum(album.id)}>{album.title}</li>)}
+                </ul>}
             </div>
+
+        </div>
+        <InfiniteScroll
+            dataLength={photosCopy.length}
+            next={loadMoreData}
+            hasMore={hasMore}
+            loader={<h4>Loading...</h4>}
+        >
             <div className=' photos-album'>
                 {photosCopy?.map(photo => <div key={photo.id}><Photo photo={photo} /></div>)}
             </div>
-        </div>
-    )
+        </InfiniteScroll >
+    </div>
 }
